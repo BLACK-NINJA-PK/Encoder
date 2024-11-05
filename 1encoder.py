@@ -8,14 +8,52 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 import io
 import uu
-import requests  # Added import
-import subprocess  # Added import
-import time  # Added import
-import sys  # Added import
-from colorama import Fore, init
+import requests
+import subprocess
+import time
+import sys
+import random
+import pyfiglet
+from colorama import Fore, Style, init
 
 # Initialize colorama for colored output
 init(autoreset=True)
+
+def clear_console():
+    """Clear the console."""
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def create_gradient_banner(text):
+    """Create a gradient banner from the provided text using a random font."""
+    fonts = ['slant', 'banner3-D', 'block', 'digital', 'banner', 'isometric1']
+    selected_font = random.choice(fonts)
+    banner = pyfiglet.figlet_format(text, font=selected_font).splitlines()
+    
+    colors = [Fore.GREEN + Style.BRIGHT, Fore.YELLOW + Style.BRIGHT, Fore.RED + Style.BRIGHT]
+    total_lines = len(banner)
+    section_size = total_lines // len(colors)
+    
+    for i, line in enumerate(banner):
+        if i < section_size:
+            print(colors[0] + line)
+        elif i < section_size * 2:
+            print(colors[1] + line)
+        else:
+            print(colors[2] + line)
+
+def gradient_text(text, colors):
+    """Apply a gradient to the text using the provided list of colors."""
+    gradient_output = ""
+    for i, char in enumerate(text):
+        gradient_output += colors[i % len(colors)] + char
+    return gradient_output
+
+def display_banner_and_social():
+    clear_console()
+    create_gradient_banner(banner_text)
+    print(gradient_text("Follow us on:", [Fore.LIGHTMAGENTA_EX, Fore.LIGHTCYAN_EX]))
+    for platform_name, username in social_media_usernames:
+        print(f"{Fore.CYAN}{platform_name + ':'} {Fore.GREEN}{username}")
 
 def check_for_updates():
     print(Fore.YELLOW + "Checking for updates...")
@@ -174,7 +212,7 @@ def encode_file(file_path, encoding_type):
             exec_code = f'import base64; exec("".join(chr(ord(c) ^ 0x42) for c in base64.b64decode("{encoded_data}".encode()).decode()))'
         elif encoding_type == "pickle_base64":
             encoded_data = en_pickle_base64(data)
-            exec_code = f'import pickle, base64; exec(pickle.loads(base64.b64decode("{encoded_data}")))'
+            exec_code = f'import pickle, base64; exec(pickle.loads(base64.b64decode("{encoded_data}".encode())))'
         elif encoding_type == "aes_base64_cfb":
             encoded_data, key = en_aes_base64_cfb(data)
             exec_code = f'import base64; from Crypto.Cipher import AES; key={key}; iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CFB, iv=iv); exec(cipher.decrypt(ciphertext).decode())'
@@ -271,6 +309,18 @@ def exit_():
     print("Exiting the program.")
     exit()
 
+# Main execution
+banner_text = "NINJA"
+social_media_usernames = [
+    ("TELEGRAM", "@black_ninja_pk"),
+    ("TELEGRAM", "@black_ninja_pk"),
+    ("Coder", "@crazy_arain"),
+]
+
+display_banner_and_social()
+
+# Check for updates
+check_for_updates()
+
 if __name__ == "__main__":
-    check_for_updates()
     main_menu()
