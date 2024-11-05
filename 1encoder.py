@@ -6,7 +6,6 @@ import zlib
 import pickle
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
-import io
 import requests
 import subprocess
 import time
@@ -47,17 +46,10 @@ def create_gradient_banner(text):
         else:
             print(colors[2] + line)
 
-def gradient_text(text, colors):
-    """Apply a gradient to the text using the provided list of colors."""
-    gradient_output = ""
-    for i, char in enumerate(text):
-        gradient_output += colors[i % len(colors)] + char
-    return gradient_output
-
 def display_banner_and_social():
     clear_console()
     create_gradient_banner(banner_text)
-    print(gradient_text("Follow us on:", [Fore.LIGHTMAGENTA_EX, Fore.LIGHTCYAN_EX]))
+    print(Fore.LIGHTMAGENTA_EX + "Follow us on:")
     for platform_name, username in social_media_usernames:
         print(f"{Fore.CYAN}{platform_name + ':'} {Fore.GREEN}{username}")
 
@@ -170,11 +162,19 @@ def en_aes_base64_cbc(data):
     return encrypted_base64, key
 
 def encode_file(file_path, encoding_type):
+    encoding_map = {
+        '1': "b2", '2': "b16", '3': "b32", '4': "b58",
+        '5': "b64", '6': "urlsafe_b64", '7': "marshal", '8': "rot13",
+        '9': "aes_base64_cfb", '10': "aes_base64_cbc", '11': "zlib_base64",
+        '12': "pickle_base64", '13': "hex", '14': "xor_base64"
+    }
+
     try:
         with open(file_path, 'rb') as file:
             data = file.read()
 
         # Encoding and exec_code creation based on encoding type
+        encoding_type = encoding_map.get(encoding_type, encoding_type)
         if encoding_type == "b2":
             encoded_data = en_base2(data)
             exec_code = f'print("{encoded_data}")'
@@ -216,8 +216,8 @@ def encode_file(file_path, encoding_type):
             exec_code = f'import base64; from Crypto.Cipher import AES; key={key}; iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CFB, iv=iv); exec(cipher.decrypt(ciphertext).decode())'
         elif encoding_type == "aes_base64_cbc":
             encoded_data, key = en_aes_base64_cbc(data)
-            key_hex = key.hex()
-            exec_code = f'import base64; from Crypto.Cipher import AES; import binascii; key=binascii.unhexlify("{key_hex}"); iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CBC, iv=iv); from base64 import b64decode; exec(cipher.decrypt(ciphertext).decode().rstrip(chr(16)))'
+            key_hex = binascii.hexlify(key).decode()
+            exec_code = f'import base64; from Crypto.Cipher import AES; import binascii; key=binascii.unhexlify("{key_hex}"); iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CBC, iv=iv); exec(cipher.decrypt(ciphertext).decode().rstrip(chr(16)))'
 
         # Save the encoded output to a file
         encoded_filename = f"{encoding_type}_encoded_{os.path.basename(file_path)}"
@@ -232,10 +232,21 @@ def encode_file(file_path, encoding_type):
 
 def main():
     display_banner_and_social()
-    filename = input("Enter file to encode (with path): ")
-    encoding_type = input("Enter encoding type (b2, b16, b32, b58, b64, urlsafe_b64, marshal, rot13, zlib_base64, hex, xor_base64, pickle_base64, aes_base64_cfb, aes_base64_cbc): ")
+    
+    print(Fore.LIGHTCYAN_EX + "\nSelect encoding type:")
+    encoding_types = {
+        '1': "b2", '2': "b16", '3': "b32", '4': "b58", '5': "b64", '6': "urlsafe_b64",
+        '7': "marshal", '8': "rot13", '9': "aes_base64_cfb", '10': "aes_base64_cbc",
+        '11': "zlib_base64", '12': "pickle_base64", '13': "hex", '14': "xor_base64"
+    }
+    for key, value in encoding_types.items():
+        print(Fore.LIGHTYELLOW_EX + f"{key}: {value}")
+
+    encoding_choice = input(Fore.LIGHTCYAN_EX + "\nEnter your choice: ")
+    filename = input(Fore.LIGHTMAGENTA_EX + "\nEnter file to encode (with path): ")
+    
     check_for_updates()
-    encode_file(filename, encoding_type)
+    encode_file(filename, encoding_choice)
 
 if __name__ == "__main__":
     main()
