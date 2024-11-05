@@ -18,6 +18,13 @@ from colorama import Fore, Style, init
 # Initialize colorama for colored output
 init(autoreset=True)
 
+# Banner text and social media information
+banner_text = "NINJA"
+social_media_usernames = [
+    ("TELEGRAM", "@black_ninja_pk"),
+    ("Coder", "@crazy_arain"),
+]
+
 def clear_console():
     """Clear the console."""
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -90,7 +97,7 @@ def update_script():
     except PermissionError:
         print(Fore.RED + "Permission denied. Try running the script with elevated permissions (e.g., 'sudo').")
 
-# Padding function for AES encryption (AES requires data to be a multiple of 16 bytes)
+# Padding functions for AES encryption
 def pad(data):
     padding_length = 16 - (len(data) % 16)
     return data + (chr(padding_length) * padding_length).encode()
@@ -136,8 +143,6 @@ def en_zlib_base64(data):
     compressed_data = zlib.compress(data)
     return base64.b64encode(compressed_data).decode()
 
-
-
 def en_hex(data):
     return data.hex()
 
@@ -169,7 +174,7 @@ def encode_file(file_path, encoding_type):
         with open(file_path, 'rb') as file:
             data = file.read()
 
-        # Encoding and exec_code creation
+        # Encoding and exec_code creation based on encoding type
         if encoding_type == "b2":
             encoded_data = en_base2(data)
             exec_code = f'print("{encoded_data}")'
@@ -197,7 +202,7 @@ def encode_file(file_path, encoding_type):
         elif encoding_type == "zlib_base64":
             encoded_data = en_zlib_base64(data)
             exec_code = f'import zlib, base64; exec(zlib.decompress(base64.b64decode("{encoded_data}")).decode())'
-         elif encoding_type == "hex":
+        elif encoding_type == "hex":
             encoded_data = en_hex(data)
             exec_code = f'exec(bytes.fromhex("{encoded_data}").decode())'
         elif encoding_type == "xor_base64":
@@ -212,106 +217,25 @@ def encode_file(file_path, encoding_type):
         elif encoding_type == "aes_base64_cbc":
             encoded_data, key = en_aes_base64_cbc(data)
             key_hex = key.hex()
-            exec_code = f'''
-import base64
-from Crypto.Cipher import AES
+            exec_code = f'import base64; from Crypto.Cipher import AES; import binascii; key=binascii.unhexlify("{key_hex}"); iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CBC, iv=iv); from base64 import b64decode; exec(cipher.decrypt(ciphertext).decode().rstrip(chr(16)))'
 
-def pad(data):
-    padding_length = 16 - (len(data) % 16)
-    return data + (chr(padding_length) * padding_length).encode()
+        # Save the encoded output to a file
+        encoded_filename = f"{encoding_type}_encoded_{os.path.basename(file_path)}"
+        with open(encoded_filename, 'w') as f:
+            f.write(f"# Encrypted file\n{exec_code}")
 
-def unpad(data):
-    return data[:-data[-1]]
-
-encrypted_data = base64.b64decode("{encoded_data}")
-key = bytes.fromhex("{key_hex}")
-iv = encrypted_data[:16]
-cipher = AES.new(key, AES.MODE_CBC, iv)
-original_data = unpad(cipher.decrypt(encrypted_data[16:]))
-exec(original_data.decode())
-            '''
-        else:
-            print(Fore.RED + "Error: Unsupported Encoding Type")
-            return None
-
-        # Write the encoded file with self-decoding functionality
-        base, ext = os.path.splitext(file_path)
-        encoded_file = f"{base}.{encoding_type}"
-        with open(encoded_file, 'w') as f:
-            f.write(f'"""Execute this script to run the original code."""\n')
-            f.write(exec_code)
-        print(Fore.GREEN + f"Encoded script saved as {encoded_file}")
-        return encoded_file
-
+        print(Fore.GREEN + f"Encoded file saved as '{encoded_filename}'")
     except FileNotFoundError:
-        print(Fore.RED + "Error: File not found. Please check the file path.")
-        return None
+        print(Fore.RED + f"File '{file_path}' not found.")
+    except Exception as e:
+        print(Fore.RED + f"Error encoding file: {e}")
 
-def main_menu():
-    print(Fore.CYAN + "\nEncoding Menu:")
-    print(Fore.YELLOW + "1. Binary (Base2)")
-    print(Fore.LIGHTGREEN_EX + "2. Base16 (Hexadecimal)")
-    print(Fore.LIGHTMAGENTA_EX + "3. Base32")
-    print(Fore.LIGHTBLUE_EX + "4. Base58")
-    print(Fore.LIGHTCYAN_EX + "5. Base64")
-    print(Fore.LIGHTYELLOW_EX + "6. URL-safe Base64")
-    print(Fore.LIGHTRED_EX + "7. Marshal (Python bytecode)")
-    print(Fore.LIGHTGREEN_EX + "8. ROT13")
-    print(Fore.LIGHTMAGENTA_EX + "9. AES Encryption + Base64 (CFB)")
-    print(Fore.LIGHTBLUE_EX + "10. AES Encryption + Base64 (CBC)")
-    print(Fore.LIGHTCYAN_EX + "11. zlib (Base64)")
-    print(Fore.LIGHTYELLOW_EX + "12. Pickle (Base64)")
-    print(Fore.LIGHTRED_EX + "13. Hexadecimal")
-    print(Fore.LIGHTGREEN_EX + "14. XOR (Base64)")
-    print(Fore.RED + "0. Quit")
-    choice = input(" >>  ")
-    exec_menu(choice)
-
-def exec_menu(choice):
-    encoding_types = {
-        '1': "b2",
-        '2': "b16",
-        '3': "b32",
-        '4': "b58",
-        '5': "b64",
-        '6': "urlsafe_b64",
-        '7': "marshal",
-        '8': "rot13",
-        '9': "aes_base64_cfb",
-        '10': "aes_base64_cbc",
-        '11': "zlib_base64",
-        '12': "pickle_base64",
-        '13': "hex",
-        '14': "xor_base64",
-        
-    }
-    if choice in encoding_types:
-        file_path = input("Enter the path to the file you want to encode: ")
-        if os.path.isfile(file_path):
-            encode_file(file_path, encoding_types[choice])
-        else:
-            print(Fore.RED + "Error: File not found.")
-    elif choice == '0':
-        exit_()
-    else:
-        print(Fore.RED + "Invalid selection, please try again.")
-        main_menu()
-
-def exit_():
-    print(Fore.GREEN + "Exiting the program.")
-    exit()
-
-# Main execution
-banner_text = "NINJA"
-social_media_usernames = [
-    ("TELEGRAM", "@black_ninja_pk"),
-    ("Coder", "@crazy_arain"),
-]
-
-display_banner_and_social()
-
-# Check for updates
-check_for_updates()
+def main():
+    display_banner_and_social()
+    filename = input("Enter file to encode (with path): ")
+    encoding_type = input("Enter encoding type (b2, b16, b32, b58, b64, urlsafe_b64, marshal, rot13, zlib_base64, hex, xor_base64, pickle_base64, aes_base64_cfb, aes_base64_cbc): ")
+    check_for_updates()
+    encode_file(filename, encoding_type)
 
 if __name__ == "__main__":
-    main_menu()
+    main()
