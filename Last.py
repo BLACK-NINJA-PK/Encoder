@@ -13,6 +13,7 @@ import sys
 import random
 import pyfiglet
 from colorama import Fore, Style, init
+import codecs
 
 # Initialize colorama for colored output
 init(autoreset=True)
@@ -25,11 +26,9 @@ social_media_usernames = [
 ]
 
 def clear_console():
-    """Clear the console."""
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def create_gradient_banner(text):
-    """Create a gradient banner from the provided text using a random font."""
     fonts = ['slant', 'banner3-D', 'block', 'digital', 'banner', 'isometric1']
     selected_font = random.choice(fonts)
     banner = pyfiglet.figlet_format(text, font=selected_font).splitlines()
@@ -97,6 +96,9 @@ def pad(data):
 def unpad(data):
     return data[:-data[-1]]
 
+
+
+
 # Encoding functions
 def en_base2(data):
     return "0" + bin(int(binascii.hexlify(data), 16))[2:]
@@ -127,7 +129,7 @@ def en_marshal(data):
     return marshal.dumps(code)
 
 def en_rot13(data):
-    return data.decode('utf-8').encode('rot_13').decode()
+    return codecs.encode(data.decode('utf-8'), 'rot_13').encode()
 
 def en_zlib_base64(data):
     compressed_data = zlib.compress(data)
@@ -159,94 +161,64 @@ def en_aes_base64_cbc(data):
     encrypted_base64 = base64.b64encode(iv + encrypted_data).decode()
     return encrypted_base64, key
 
-# Include all encoding functions (same as in previous scripts)
-
-# Main encoding function
 def encode_file(file_path, encoding_type):
     try:
         with open(file_path, 'rb') as file:
             data = file.read()
-            #execute 
-                if encoding_type == "b2":
-            encoded_data = en_base2(data)
-            exec_code = f'print("{encoded_data}")'
-        elif encoding_type == "b16":
-            encoded_data = en_base16(data)
-            exec_code = f'import base64\nexec(base64.b16decode("{encoded_data}".encode()).decode())'
-        elif encoding_type == "b32":
-            encoded_data = en_base32(data)
-            exec_code = f'import base64\nexec(base64.b32decode("{encoded_data}".encode()).decode())'
-        elif encoding_type == "b58":
-            encoded_data = en_base58(data)
-            exec_code = f'print("{encoded_data}")'
-        elif encoding_type == "b64":
-            encoded_data = en_base64(data)
-            exec_code = f'import base64\nexec(base64.b64decode("{encoded_data}".encode()).decode())'
-        elif encoding_type == "urlsafe_b64":
-            encoded_data = en_urlsafe_base64(data)
-            exec_code = f'import base64\nexec(base64.urlsafe_b64decode("{encoded_data}".encode()).decode())'
-        elif encoding_type == "marshal":
-            code_object = en_marshal(data.decode())
-            exec_code = f'import marshal\nexec(marshal.loads({repr(code_object)}))'
-        elif encoding_type == "rot13":
-            encoded_data = en_rot13(data)
-            exec_code = f'exec("{encoded_data}".encode("rot_13"))'
-        elif encoding_type == "zlib_base64":
-            encoded_data = en_zlib_base64(data)
+            if encoding_type == "b2":
+                encoded_data = en_base2(data)
+                exec_code = f'print("{encoded_data}")'
+            elif encoding_type == "b16":
+                encoded_data = en_base16(data)
+                exec_code = f'import base64\nexec(base64.b16decode("{encoded_data}".encode()).decode())'
+            elif encoding_type == "b32":
+                encoded_data = en_base32(data)
+                exec_code = f'import base64\nexec(base64.b32decode("{encoded_data}".encode()).decode())'
+            elif encoding_type == "b58":
+                encoded_data = en_base58(data)
+                exec_code = f'print("{encoded_data}")'
+            elif encoding_type == "b64":
+                encoded_data = en_base64(data)
+                exec_code = f'import base64\nexec(base64.b64decode("{encoded_data}".encode()).decode())'
+            elif encoding_type == "urlsafe_b64":
+                encoded_data = en_urlsafe_base64(data)
+                exec_code = f'import base64\nexec(base64.urlsafe_b64decode("{encoded_data}".encode()).decode())'
+            elif encoding_type == "marshal":
+                code_object = en_marshal(data.decode())
+                exec_code = f'import marshal\nexec(marshal.loads({repr(code_object)}))'
+            elif encoding_type == "rot13":
+                encoded_data = en_rot13(data)
+                exec_code = f'exec("{encoded_data.decode()}")'
+            elif encoding_type == "zlib_base64":
+                encoded_data = en_zlib_base64(data)
+                exec_code = f'import base64, zlib\nexec(zlib.decompress(base64.b64decode("{encoded_data}".encode())).decode())'
+            elif encoding_type == "hex":
+                encoded_data = en_hex(data)
+                exec_code = f'exec(bytes.fromhex("{encoded_data}").decode())'
+            elif encoding_type == "xor_base64":
+                encoded_data = en_xor_base64(data)
+                exec_code = f'import base64; exec("".join(chr(ord(c) ^ 0x42) for c in base64.b64decode("{encoded_data}".encode()).decode()))'
+            elif encoding_type == "pickle_base64":
+                encoded_data = en_pickle_base64(data)
+                exec_code = f'import pickle, base64; exec(pickle.loads(base64.b64decode("{encoded_data}")))'
+            elif encoding_type == "aes_base64_cfb":
+                encoded_data, key = en_aes_base64_cfb(data)
+                exec_code = f'import base64; from Crypto.Cipher import AES; key={key}; iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CFB, iv=iv); exec(cipher.decrypt(ciphertext).decode())'
+            elif encoding_type == "aes_base64_cbc":
+                encoded_data, key = en_aes_base64_cbc(data)
+                exec_code = f'import base64; from Crypto.Cipher import AES; key={key}; iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CBC, iv); exec(cipher.decrypt(ciphertext).decode())'
+                
             
-          elif encoding_type == "hex":
-            encoded_data = en_hex(data)
-            exec_code = f'exec(bytes.fromhex("{encoded_data}").decode())'
-        elif encoding_type == "xor_base64":
-            encoded_data = en_xor_base64(data)
-            exec_code = f'import base64; exec("".join(chr(ord(c) ^ 0x42) for c in base64.b64decode("{encoded_data}".encode()).decode()))'
-        elif encoding_type == "pickle_base64":
-            encoded_data = en_pickle_base64(data)
-            exec_code = f'import pickle, base64; exec(pickle.loads(base64.b64decode("{encoded_data}")))'
-        elif encoding_type == "aes_base64_cfb":
-            encoded_data, key = en_aes_base64_cfb(data)
-            exec_code = f'import base64; from Crypto.Cipher import AES; key={key}; iv_ciphertext=base64.b64decode("{encoded_data}"); iv=iv_ciphertext[:16]; ciphertext=iv_ciphertext[16:]; cipher=AES.new(key, AES.MODE_CFB, iv=iv); exec(cipher.decrypt(ciphertext).decode())'
-        elif encoding_type == "aes_base64_cbc":
-            encoded_data, key = en_aes_base64_cbc(data)
-            key_hex = key.hex()
-            exec_code = f'''
-            
-            
-            import base64
-from Crypto.Cipher import AES
 
-def pad(data):
-    padding_length = 16 - (len(data) % 16)
-    return data + (chr(padding_length) * padding_length).encode()
+            output_file_path = f"{file_path}_{encoding_type}_encoded.py"
+            with open(output_file_path, 'w') as output_file:
+                output_file.write(exec_code)
 
-def unpad(data):
-    return data[:-data[-1]]
+            print(Fore.GREEN + f"File encoded successfully: {output_file_path}")
+    except Exception as e:
+        print(Fore.RED + f"Error encoding file: {e}")
 
-encrypted_data = base64.b64decode("{encoded_data}")
-key = bytes.fromhex("{key_hex}")
-iv = encrypted_data[:16]
-cipher = AES.new(key, AES.MODE_CBC, iv)
-original_data = unpad(cipher.decrypt(encrypted_data[16:]))
-exec(original_data.decode())
-            '''
-        else:
-            print("Error: Unsupported Encoding Type")
-            return None
-            
-              # Write the encoded file with self-decoding functionality
-        encoded_file = file_path + f'.{encoding_type}'
-        with open(encoded_file, 'w') as f:
-            f.write(f'"""Execute this script to run the original code."""\n')
-            f.write(exec_code)
-        print(f"Encoded script saved as {encoded_file}")
-        return encoded_file
-
-    except FileNotFoundError:
-        print("Error: File not found. Please check the file path.")
-        return None
-            
-    # Body of this function is same as the previous script
-
+def main_menu():
 def main_menu():
     print(Fore.LIGHTCYAN_EX + "\nEncoding Menu:")
     print(Fore.LIGHTYELLOW_EX + "1. Binary (Base2)")
@@ -257,52 +229,39 @@ def main_menu():
     print(Fore.LIGHTYELLOW_EX + "6. URL-safe Base64")
     print(Fore.LIGHTGREEN_EX + "7. Marshal (Python bytecode)")
     print(Fore.LIGHTBLUE_EX + "8. ROT13")
-    print(Fore.LIGHTMAGENTA_EX + "9. AES Encryption + Base64 (CFB)")
-    print(Fore.LIGHTCYAN_EX + "10. AES Encryption + Base64 (CBC)")
-    print(Fore.LIGHTYELLOW_EX + "11. zlib (Base64)")
-    print(Fore.LIGHTGREEN_EX + "12. Hexadecimal")
-    print(Fore.LIGHTBLUE_EX + "13. XOR (Base64)")
-    print(Fore.LIGHTMAGENTA_EX + "14. Pickle (Base64)")
+    print(Fore.LIGHTMAGENTA_EX + "9. zlib (Base64)")
+    print(Fore.LIGHTCYAN_EX + "10. Hexadecimal")
+    print(Fore.LIGHTYELLOW_EX + "11. XOR (Base64)")
+    print(Fore.LIGHTGREEN_EX + "12.  Pickle (Base64)")
+    print(Fore.LIGHTBLUE_EX + "13. AES Encryption + Base64 (CFB)")
+    print(Fore.LIGHTMAGENTA_EX + "14.AES Encryption + Base64 (CBC)")
     print(Fore.RED + "0. Quit")
     choice = input(Fore.LIGHTCYAN_EX + " >>  ")
     exec_menu(choice)
-
     
-
-def exec_menu(choice):
-    encoding_types = {
-        '1': "b2",
-        '2': "b16",
-        '3': "b32",
-        '4': "b58",
-        '5': "b64",
-        '6': "urlsafe_b64",
-        '7': "marshal",
-        '8': "rot13",
-        '9': "aes_base64_cfb",
-        '10': "aes_base64_cbc",
-        '11': "zlib_base64",
-        '12': "uuencode",
-        '13': "hex",
-        '14': "xor_base64",
-        '15': "pickle_base64",
+    exec_menu = {
+        "1": "b2",
+        "2": "b16",
+        "3": "b32",
+        "4": "b58",
+        "5": "b64",
+        "6": "urlsafe_b64",
+        "7": "marshal",
+        "8": "rot13",
+        "9": "zlib_base64",
+        "10": "hex",
+        "11": "xor_base64",
+        "12": "pickle_base64",
+        "13": "aes_base64_cfb",
+        "14": "aes_base64_cbc",
     }
     
-    if choice in encoding_types:
-        file_path = input(Fore.LIGHTMAGENTA_EX + "Enter the path to the file you want to encode: ")
-        if os.path.isfile(file_path):
-            encode_file(file_path, encoding_types[choice])
-        else:
-            print(Fore.RED + "Error: File not found.")
-    elif choice == '0':
-        exit_()
+    encoding_type = exec_menu.get(choice)
+    if encoding_type:
+        file_path = input("Enter the file path: ")
+        encode_file(file_path, encoding_type)
     else:
-        print(Fore.RED + "Invalid selection, please try again.")
-        main_menu()
-
-def exit_():
-    print(Fore.GREEN + "Exiting the program.")
-    sys.exit(0)
+        print(Fore.RED + "Invalid choice")
 
 if __name__ == "__main__":
     display_banner_and_social()
