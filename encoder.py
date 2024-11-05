@@ -3,24 +3,32 @@ import base64
 import binascii
 import subprocess
 
-REPO_URL = "https://github.com/BLACK-NINJA-PK/Encoder-Decoder.git"
-LOCAL_REPO_PATH = "Encoder-Decoder"  # Path where the repo will be cloned
-
 def check_for_updates():
-    if os.path.exists(LOCAL_REPO_PATH):
-        # If the repository exists locally, pull the latest changes
-        try:
-            subprocess.check_call(["git", "-C", LOCAL_REPO_PATH, "pull"])
-            print("Repository updated successfully.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error pulling updates: {e}")
+    print(Fore.YELLOW + "Checking for updates...")
+    repo_url = 'BLACK-NINJA-PK/Encoder-Decoder'
+    api_url = f'https://api.github.com/repos/{repo_url}/commits/main'
+    response = requests.get(api_url)
+    latest_commit = response.json().get('sha')
+    current_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).strip().decode()
+
+    if latest_commit != current_commit:
+        print(Fore.RED + "New update available. Updating...")
+        update_script()
     else:
-        # If the repository doesn't exist, clone it
-        try:
-            subprocess.check_call(["git", "clone", REPO_URL, LOCAL_REPO_PATH])
-            print("Repository cloned successfully.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error cloning repository: {e}")
+        print(Fore.GREEN + "Your script is up to date.")
+
+def update_script():
+    try:
+        subprocess.run(["git", "pull"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print(Fore.GREEN + "Script updated successfully!")
+        time.sleep(2)
+        print(Fore.CYAN + f"\nTo run the script again, use the command:\npython {os.path.basename(__file__)}")
+        sys.exit(0)
+    except subprocess.CalledProcessError as e:
+        print(Fore.RED + f"Failed to update the script: {e}")
+    except PermissionError:
+        print(Fore.RED + "Permission denied. Try running the script with elevated permissions (e.g., 'sudo').")
+
 
 # Encoding functions (remaining the same as in your original script)
 def en_base2(data):
