@@ -230,27 +230,8 @@ def encode_file(file_path, encoding_type):
         return None
 
 
-def main_menu():
-    print(Fore.LIGHTCYAN_EX + "\nEncoding Menu:")
-    print(Fore.LIGHTYELLOW_EX + "1. Binary (Base2)")
-    print(Fore.LIGHTGREEN_EX + "2. Base16 (Hexadecimal)")
-    print(Fore.LIGHTBLUE_EX + "3. Base32")
-    print(Fore.LIGHTMAGENTA_EX + "4. Base58")
-    print(Fore.LIGHTCYAN_EX + "5. Base64")
-    print(Fore.LIGHTYELLOW_EX + "6. URL-safe Base64")
-    print(Fore.LIGHTGREEN_EX + "7. Marshal (Python bytecode)")
-    print(Fore.LIGHTBLUE_EX + "8. ROT13")
-    print(Fore.LIGHTMAGENTA_EX + "9. zlib (Base64)")
-    print(Fore.LIGHTCYAN_EX + "10. Hexadecimal")
-    print(Fore.LIGHTYELLOW_EX + "11. XOR (Base64)")
-    print(Fore.LIGHTGREEN_EX + "12.  Pickle (Base64)")
-    print(Fore.LIGHTBLUE_EX + "13. AES Encryption + Base64 (CFB)")
-    print(Fore.LIGHTMAGENTA_EX + "14.AES Encryption + Base64 (CBC)")
-    print(Fore.RED + "0. Quit")
-    choice = input(Fore.LIGHTCYAN_EX + " >>  ")
-    exec_menu(choice)
-    
-    exec_menu = {
+def exec_menu(choice):
+    encoding_options = {
         "1": "b2",
         "2": "b16",
         "3": "b32",
@@ -267,12 +248,32 @@ def main_menu():
         "14": "aes_base64_cbc",
     }
     
-    encoding_type = exec_menu.get(choice)
+    encoding_type = encoding_options.get(choice)
     if encoding_type:
         file_path = input("Enter the file path: ")
         encode_file(file_path, encoding_type)
     else:
         print(Fore.RED + "Invalid choice")
+
+def main_menu():
+    print(Fore.LIGHTCYAN_EX + "\nEncoding Menu:")
+    print(Fore.LIGHTYELLOW_EX + "1. Binary (Base2)")
+    print(Fore.LIGHTGREEN_EX + "2. Base16 (Hexadecimal)")
+    print(Fore.LIGHTBLUE_EX + "3. Base32")
+    print(Fore.LIGHTMAGENTA_EX + "4. Base58")
+    print(Fore.LIGHTCYAN_EX + "5. Base64")
+    print(Fore.LIGHTYELLOW_EX + "6. URL-safe Base64")
+    print(Fore.LIGHTGREEN_EX + "7. Marshal (Python bytecode)")
+    print(Fore.LIGHTBLUE_EX + "8. ROT13")
+    print(Fore.LIGHTMAGENTA_EX + "9. zlib (Base64)")
+    print(Fore.LIGHTCYAN_EX + "10. Hexadecimal")
+    print(Fore.LIGHTYELLOW_EX + "11. XOR (Base64)")
+    print(Fore.LIGHTGREEN_EX + "12.  Pickle (Base64)")
+    print(Fore.LIGHTBLUE_EX + "13. AES Encryption + Base64 (CFB)")
+    print(Fore.LIGHTMAGENTA_EX + "14. AES Encryption + Base64 (CBC)")
+    print(Fore.RED + "0. Quit")
+    choice = input(Fore.LIGHTCYAN_EX + " >>  ")
+    exec_menu(choice)
 
 if __name__ == "__main__":
     display_banner_and_social()
