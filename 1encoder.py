@@ -280,10 +280,10 @@ def exec_menu(choice):
         '9': "aes_base64_cfb",
         '10': "aes_base64_cbc",
         '11': "zlib_base64",
-        '12': "uuencode",
+        '12': "pickle_base64",
         '13': "hex",
         '14': "xor_base64",
-        '15': "pickle_base64",
+        
     }
     if choice in encoding_types:
         file_path = input("Enter the path to the file you want to encode: ")
