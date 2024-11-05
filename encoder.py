@@ -17,7 +17,7 @@ def check_for_updates():
     
     try:
         response = requests.get(api_url)
-        response.raise_for_status()  # Raise an error for bad status codes
+        response.raise_for_status()
         latest_commit = response.json().get('sha')
         
         try:
@@ -46,7 +46,7 @@ def update_script():
     except PermissionError:
         print(Fore.RED + "Permission denied. Try running the script with elevated permissions (e.g., 'sudo').")
 
-# Encoding functions (remaining the same as in your original script)
+# Encoding functions
 def en_base2(data):
     return "0" + bin(int(binascii.hexlify(data), 16))[2:]
 
@@ -86,31 +86,28 @@ def encode_file(file_path, encoding_type):
         with open(file_path, 'rb') as file:
             data = file.read()
 
-        encoded_results = ""
         if encoding_type == "b":
-            encoded_results = "Binary: " + en_base2(data)
+            return "Binary: " + en_base2(data)
         elif encoding_type == "b16":
-            encoded_results = "Base16: " + en_base16(data)
+            return "Base16: " + en_base16(data)
         elif encoding_type == "b32":
-            encoded_results = "Base32: " + en_base32(data)
+            return "Base32: " + en_base32(data)
         elif encoding_type == "b58":
-            encoded_results = "Base58: " + en_base58(data)
+            return "Base58: " + en_base58(data)
         elif encoding_type == "b64":
-            encoded_results = "Base64: " + en_base64(data)
+            return "Base64: " + en_base64(data)
         elif encoding_type == "urlsafe_b64":
-            encoded_results = "URL-safe Base64: " + en_urlsafe_base64(data)
+            return "URL-safe Base64: " + en_urlsafe_base64(data)
         elif encoding_type == "all":
-            encoded_results = en_all(data)
+            return en_all(data)
         else:
             print("Error: Unsupported Encoding Type")
-            return
-
-        save_encoded_file(file_path, encoded_results)
-
+            return None
     except FileNotFoundError:
         print("Error: File not found. Please check the file path.")
+        return None
 
-def save_encoded_file(original_file_path, encoded_data):
+def save_encoded_data_to_file(original_file_path, encoded_data):
     base_name, ext = os.path.splitext(original_file_path)
     new_file_name = f"{base_name}_encoded{ext}"
 
@@ -156,7 +153,12 @@ def exec_menu(choice):
 def encode_option(encoding_type):
     file_path = input("Enter the path to the file you want to encode: ")
     if os.path.isfile(file_path):
-        encode_file(file_path, encoding_type)
+        encoded_data = encode_file(file_path, encoding_type)
+        if encoded_data:
+            print("Encoded Data:\n", encoded_data)
+            save_choice = input("Do you want to save the encoded data to a file? (y/n): ").lower()
+            if save_choice == 'y':
+                save_encoded_data_to_file(file_path, encoded_data)
     else:
         print("Error: File not found.")
     main_menu()
