@@ -4,7 +4,7 @@ import base64
 import binascii
 
 VERSION = "1.0.0"  # Update this version when making changes
-REPO_URL = "https://raw.githubusercontent.com/BLACK-NINJA-PK/Encoder-Decoder/main/your_script.py"  # Update with your script path on GitHub
+REPO_URL = "https://raw.githubusercontent.com/BLACK-NINJA-PK/Encoder-Decoder"  # Update with your script path on GitHub
 
 def check_for_updates():
     try:
