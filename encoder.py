@@ -27,38 +27,56 @@ def en_urlsafe_base64(data):
     return base64.urlsafe_b64encode(data).decode()
 
 def en_all(data):
-    print("Encoding Results:")
-    print("Binary : " + en_base2(data))
-    print("Base16 : " + en_base16(data))
-    print("Base32 : " + en_base32(data))
-    print("Base58 : " + en_base58(data))
-    print("Base64 : " + en_base64(data))
-    print("URL-safe Base64 : " + en_urlsafe_base64(data))
+    return (
+        "Binary: " + en_base2(data) + "\n" +
+        "Base16: " + en_base16(data) + "\n" +
+        "Base32: " + en_base32(data) + "\n" +
+        "Base58: " + en_base58(data) + "\n" +
+        "Base64: " + en_base64(data) + "\n" +
+        "URL-safe Base64: " + en_urlsafe_base64(data)
+    )
 
 def encode_file(file_path, encoding_type):
     try:
         with open(file_path, 'rb') as file:
             data = file.read()
 
+        encoded_results = ""
         if encoding_type == "b":
-            print("Binary : " + en_base2(data))
+            encoded_results = "Binary: " + en_base2(data)
         elif encoding_type == "b16":
-            print("Base16 : " + en_base16(data))
+            encoded_results = "Base16: " + en_base16(data)
         elif encoding_type == "b32":
-            print("Base32 : " + en_base32(data))
+            encoded_results = "Base32: " + en_base32(data)
         elif encoding_type == "b58":
-            print("Base58 : " + en_base58(data))
+            encoded_results = "Base58: " + en_base58(data)
         elif encoding_type == "b64":
-            print("Base64 : " + en_base64(data))
+            encoded_results = "Base64: " + en_base64(data)
         elif encoding_type == "urlsafe_b64":
-            print("URL-safe Base64 : " + en_urlsafe_base64(data))
+            encoded_results = "URL-safe Base64: " + en_urlsafe_base64(data)
         elif encoding_type == "all":
-            en_all(data)
+            encoded_results = en_all(data)
         else:
             print("Error: Unsupported Encoding Type")
+            return
+
+        # Save to a new file
+        save_encoded_file(file_path, encoded_results)
 
     except FileNotFoundError:
         print("Error: File not found. Please check the file path.")
+
+def save_encoded_file(original_file_path, encoded_data):
+    # Create a new filename
+    base_name = os.path.basename(original_file_path)
+    name, ext = os.path.splitext(base_name)
+    new_file_name = f"{name}_encoded.txt"
+    
+    # Write the encoded data to a new file
+    with open(new_file_name, 'w') as encoded_file:
+        encoded_file.write(encoded_data)
+    
+    print(f"Encoded data saved to: {new_file_name}")
 
 # Main menu
 def main_menu():
