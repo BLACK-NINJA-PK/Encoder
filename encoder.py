@@ -107,15 +107,6 @@ def encode_file(file_path, encoding_type):
         print("Error: File not found. Please check the file path.")
         return None
 
-def save_encoded_data_to_file(original_file_path, encoded_data):
-    base_name, ext = os.path.splitext(original_file_path)
-    new_file_name = f"{base_name}_encoded{ext}"
-
-    with open(new_file_name, 'w') as encoded_file:
-        encoded_file.write(encoded_data)
-
-    print(f"Encoded data saved to: {new_file_name}")
-
 def main_menu():
     print("\nEncoding Menu:")
     print("1. Binary (Base2)")
@@ -156,9 +147,6 @@ def encode_option(encoding_type):
         encoded_data = encode_file(file_path, encoding_type)
         if encoded_data:
             print("Encoded Data:\n", encoded_data)
-            save_choice = input("Do you want to save the encoded data to a file? (y/n): ").lower()
-            if save_choice == 'y':
-                save_encoded_data_to_file(file_path, encoded_data)
     else:
         print("Error: File not found.")
     main_menu()
