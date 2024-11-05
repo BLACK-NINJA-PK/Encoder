@@ -60,20 +60,21 @@ def encode_file(file_path, encoding_type):
             print("Error: Unsupported Encoding Type")
             return
 
-        # Save to a new file with the same name
+        # Save to a new file with the same name and _encoded suffix
         save_encoded_file(file_path, encoded_results)
 
     except FileNotFoundError:
         print("Error: File not found. Please check the file path.")
 
 def save_encoded_file(original_file_path, encoded_data):
-    # Keep the original filename and change the extension to .txt
-    new_file_name = f"{original_file_path}.txt"
-    
-    # Write the encoded data to a new file
+    # Split the original file path into name and extension
+    base_name, ext = os.path.splitext(original_file_path)
+    new_file_name = f"{base_name}_encoded{ext}"  # Add "_encoded" before the extension
+
+    # Write the encoded data to the new file
     with open(new_file_name, 'w') as encoded_file:
         encoded_file.write(encoded_data)
-    
+
     print(f"Encoded data saved to: {new_file_name}")
 
 # Main menu
