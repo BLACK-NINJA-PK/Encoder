@@ -1,34 +1,28 @@
-import requests
 import os
 import base64
 import binascii
+import subprocess
 
-VERSION = "1.0.0"  # Update this version when making changes
-REPO_URL = "https://raw.githubusercontent.com/BLACK-NINJA-PK/Encoder-Decoder"  # Update with your script path on GitHub
+REPO_URL = "https://github.com/BLACK-NINJA-PK/Encoder-Decoder.git"
+LOCAL_REPO_PATH = "Encoder-Decoder"  # Path where the repo will be cloned
 
 def check_for_updates():
-    try:
-        response = requests.get(REPO_URL)
-        latest_version = response.headers.get('ETag', None)  # Use ETag to check for updates
+    if os.path.exists(LOCAL_REPO_PATH):
+        # If the repository exists locally, pull the latest changes
+        try:
+            subprocess.check_call(["git", "-C", LOCAL_REPO_PATH, "pull"])
+            print("Repository updated successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error pulling updates: {e}")
+    else:
+        # If the repository doesn't exist, clone it
+        try:
+            subprocess.check_call(["git", "clone", REPO_URL, LOCAL_REPO_PATH])
+            print("Repository cloned successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error cloning repository: {e}")
 
-        if latest_version and latest_version != VERSION:
-            print("An update is available. Updating...")
-            download_update()
-        else:
-            print("You are using the latest version.")
-    except Exception as e:
-        print(f"Error checking for updates: {e}")
-
-def download_update():
-    try:
-        response = requests.get(REPO_URL)
-        with open(__file__, 'wb') as f:  # Overwrite the current file
-            f.write(response.content)
-        print("Update successful. Please restart the program.")
-        exit()
-    except Exception as e:
-        print(f"Error downloading update: {e}")
-
+# Encoding functions (remaining the same as in your original script)
 def en_base2(data):
     return "0" + bin(int(binascii.hexlify(data), 16))[2:]
 
@@ -87,24 +81,20 @@ def encode_file(file_path, encoding_type):
             print("Error: Unsupported Encoding Type")
             return
 
-        # Save to a new file with the same name and _encoded suffix
         save_encoded_file(file_path, encoded_results)
 
     except FileNotFoundError:
         print("Error: File not found. Please check the file path.")
 
 def save_encoded_file(original_file_path, encoded_data):
-    # Split the original file path into name and extension
     base_name, ext = os.path.splitext(original_file_path)
-    new_file_name = f"{base_name}_encoded{ext}"  # Add "_encoded" before the extension
+    new_file_name = f"{base_name}_encoded{ext}"
 
-    # Write the encoded data to the new file
     with open(new_file_name, 'w') as encoded_file:
         encoded_file.write(encoded_data)
 
     print(f"Encoded data saved to: {new_file_name}")
 
-# Main menu
 def main_menu():
     print("\nEncoding Menu:")
     print("1. Binary (Base2)")
@@ -118,7 +108,6 @@ def main_menu():
     choice = input(" >>  ")
     exec_menu(choice)
 
-# Execute menu
 def exec_menu(choice):
     if choice == '1':
         encode_option("b")
@@ -152,7 +141,6 @@ def exit_():
     print("Exiting the program.")
     exit()
 
-# Start the program
 if __name__ == "__main__":
     check_for_updates()
     main_menu()
