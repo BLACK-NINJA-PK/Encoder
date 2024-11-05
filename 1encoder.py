@@ -238,7 +238,7 @@ original_data = unpad(cipher.decrypt(encrypted_data[16:]))
 exec(original_data.decode())
             '''
         else:
-            print("Error: Unsupported Encoding Type")
+            print(Fore.RED + "Error: Unsupported Encoding Type")
             return None
 
         # Write the encoded file with self-decoding functionality
@@ -247,31 +247,31 @@ exec(original_data.decode())
         with open(encoded_file, 'w') as f:
             f.write(f'"""Execute this script to run the original code."""\n')
             f.write(exec_code)
-        print(f"Encoded script saved as {encoded_file}")
+        print(Fore.GREEN + f"Encoded script saved as {encoded_file}")
         return encoded_file
 
     except FileNotFoundError:
-        print("Error: File not found. Please check the file path.")
+        print(Fore.RED + "Error: File not found. Please check the file path.")
         return None
 
 def main_menu():
-    print("\nEncoding Menu:")
-    print("1. Binary (Base2)")
-    print("2. Base16 (Hexadecimal)")
-    print("3. Base32")
-    print("4. Base58")
-    print("5. Base64")
-    print("6. URL-safe Base64")
-    print("7. Marshal (Python bytecode)")
-    print("8. ROT13")
-    print("9. AES Encryption + Base64 (CFB)")
-    print("10. AES Encryption + Base64 (CBC)")
-    print("11. zlib (Base64)")
-    print("12. UUencode")
-    print("13. Hexadecimal")
-    print("14. XOR (Base64)")
-    print("15. Pickle (Base64)")
-    print("0. Quit")
+    print(Fore.CYAN + "\nEncoding Menu:")
+    print(Fore.YELLOW + "1. Binary (Base2)")
+    print(Fore.LIGHTGREEN_EX + "2. Base16 (Hexadecimal)")
+    print(Fore.LIGHTMAGENTA_EX + "3. Base32")
+    print(Fore.LIGHTBLUE_EX + "4. Base58")
+    print(Fore.LIGHTCYAN_EX + "5. Base64")
+    print(Fore.LIGHTYELLOW_EX + "6. URL-safe Base64")
+    print(Fore.LIGHTRED_EX + "7. Marshal (Python bytecode)")
+    print(Fore.LIGHTGREEN_EX + "8. ROT13")
+    print(Fore.LIGHTMAGENTA_EX + "9. AES Encryption + Base64 (CFB)")
+    print(Fore.LIGHTBLUE_EX + "10. AES Encryption + Base64 (CBC)")
+    print(Fore.LIGHTCYAN_EX + "11. zlib (Base64)")
+    print(Fore.LIGHTYELLOW_EX + "12. UUencode")
+    print(Fore.LIGHTRED_EX + "13. Hexadecimal")
+    print(Fore.LIGHTGREEN_EX + "14. XOR (Base64)")
+    print(Fore.LIGHTMAGENTA_EX + "15. Pickle (Base64)")
+    print(Fore.RED + "0. Quit")
     choice = input(" >>  ")
     exec_menu(choice)
 
@@ -298,21 +298,20 @@ def exec_menu(choice):
         if os.path.isfile(file_path):
             encode_file(file_path, encoding_types[choice])
         else:
-            print("Error: File not found.")
+            print(Fore.RED + "Error: File not found.")
     elif choice == '0':
         exit_()
     else:
-        print("Invalid selection, please try again.")
+        print(Fore.RED + "Invalid selection, please try again.")
         main_menu()
 
 def exit_():
-    print("Exiting the program.")
+    print(Fore.GREEN + "Exiting the program.")
     exit()
 
 # Main execution
 banner_text = "NINJA"
 social_media_usernames = [
-    ("TELEGRAM", "@black_ninja_pk"),
     ("TELEGRAM", "@black_ninja_pk"),
     ("Coder", "@crazy_arain"),
 ]
