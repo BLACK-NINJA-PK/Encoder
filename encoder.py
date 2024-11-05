@@ -6,13 +6,11 @@ import binascii
 VERSION = "1.0.0"  # Update this version when making changes
 REPO_URL = "https://raw.githubusercontent.com/BLACK-NINJA-PK/Encoder-Decoder/main/your_script.py"  # Update with your script path on GitHub
 
-# Function to check for updates
 def check_for_updates():
     try:
         response = requests.get(REPO_URL)
         latest_version = response.headers.get('ETag', None)  # Use ETag to check for updates
 
-        # Assuming the ETag corresponds to the version (you can use a specific file to store version info)
         if latest_version and latest_version != VERSION:
             print("An update is available. Updating...")
             download_update()
@@ -21,7 +19,6 @@ def check_for_updates():
     except Exception as e:
         print(f"Error checking for updates: {e}")
 
-# Function to download the latest version of the script
 def download_update():
     try:
         response = requests.get(REPO_URL)
@@ -31,12 +28,6 @@ def download_update():
         exit()
     except Exception as e:
         print(f"Error downloading update: {e}")
-
-# Call check_for_updates at the beginning of your main program
-if __name__ == "__main__":
-    check_for_updates()
-    main_menu()
-
 
 def en_base2(data):
     return "0" + bin(int(binascii.hexlify(data), 16))[2:]
@@ -163,4 +154,5 @@ def exit_():
 
 # Start the program
 if __name__ == "__main__":
+    check_for_updates()
     main_menu()
