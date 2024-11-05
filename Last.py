@@ -218,7 +218,7 @@ def encode_file(file_path, encoding_type):
     except Exception as e:
         print(Fore.RED + f"Error encoding file: {e}")
 
-def main_menu():
+
 def main_menu():
     print(Fore.LIGHTCYAN_EX + "\nEncoding Menu:")
     print(Fore.LIGHTYELLOW_EX + "1. Binary (Base2)")
