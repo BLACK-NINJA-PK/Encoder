@@ -7,7 +7,6 @@ import pickle
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 import io
-import uu
 import requests
 import subprocess
 import time
@@ -137,10 +136,7 @@ def en_zlib_base64(data):
     compressed_data = zlib.compress(data)
     return base64.b64encode(compressed_data).decode()
 
-def en_uuencode(data):
-    encoded_io = io.BytesIO()
-    uu.encode(io.BytesIO(data), encoded_io, name='encoded_file')
-    return encoded_io.getvalue().decode()
+
 
 def en_hex(data):
     return data.hex()
@@ -201,10 +197,7 @@ def encode_file(file_path, encoding_type):
         elif encoding_type == "zlib_base64":
             encoded_data = en_zlib_base64(data)
             exec_code = f'import zlib, base64; exec(zlib.decompress(base64.b64decode("{encoded_data}")).decode())'
-        elif encoding_type == "uuencode":
-            encoded_data = en_uuencode(data)
-            exec_code = f'import uu, io; decoded_io = io.StringIO("""{encoded_data}"""); uu.decode(decoded_io, sys.stdout)'
-        elif encoding_type == "hex":
+         elif encoding_type == "hex":
             encoded_data = en_hex(data)
             exec_code = f'exec(bytes.fromhex("{encoded_data}").decode())'
         elif encoding_type == "xor_base64":
@@ -267,10 +260,9 @@ def main_menu():
     print(Fore.LIGHTMAGENTA_EX + "9. AES Encryption + Base64 (CFB)")
     print(Fore.LIGHTBLUE_EX + "10. AES Encryption + Base64 (CBC)")
     print(Fore.LIGHTCYAN_EX + "11. zlib (Base64)")
-    print(Fore.LIGHTYELLOW_EX + "12. UUencode")
+    print(Fore.LIGHTYELLOW_EX + "12. Pickle (Base64)")
     print(Fore.LIGHTRED_EX + "13. Hexadecimal")
     print(Fore.LIGHTGREEN_EX + "14. XOR (Base64)")
-    print(Fore.LIGHTMAGENTA_EX + "15. Pickle (Base64)")
     print(Fore.RED + "0. Quit")
     choice = input(" >>  ")
     exec_menu(choice)
