@@ -2,20 +2,37 @@ import os
 import base64
 import binascii
 import subprocess
+import requests
+import time
+import sys
+from colorama import Fore, init
+
+# Initialize colorama for colored output
+init(autoreset=True)
 
 def check_for_updates():
     print(Fore.YELLOW + "Checking for updates...")
     repo_url = 'BLACK-NINJA-PK/Encoder-Decoder'
     api_url = f'https://api.github.com/repos/{repo_url}/commits/main'
-    response = requests.get(api_url)
-    latest_commit = response.json().get('sha')
-    current_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).strip().decode()
+    
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        latest_commit = response.json().get('sha')
+        
+        try:
+            current_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).strip().decode()
+        except subprocess.CalledProcessError:
+            print(Fore.RED + "Error: Could not retrieve the current commit. Are you in a Git repository?")
+            return
 
-    if latest_commit != current_commit:
-        print(Fore.RED + "New update available. Updating...")
-        update_script()
-    else:
-        print(Fore.GREEN + "Your script is up to date.")
+        if latest_commit != current_commit:
+            print(Fore.RED + "New update available. Updating...")
+            update_script()
+        else:
+            print(Fore.GREEN + "Your script is up to date.")
+    except requests.RequestException as e:
+        print(Fore.RED + f"Failed to check for updates: {e}")
 
 def update_script():
     try:
@@ -28,7 +45,6 @@ def update_script():
         print(Fore.RED + f"Failed to update the script: {e}")
     except PermissionError:
         print(Fore.RED + "Permission denied. Try running the script with elevated permissions (e.g., 'sudo').")
-
 
 # Encoding functions (remaining the same as in your original script)
 def en_base2(data):
