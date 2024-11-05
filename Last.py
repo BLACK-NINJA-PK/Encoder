@@ -217,6 +217,17 @@ def encode_file(file_path, encoding_type):
             print(Fore.GREEN + f"File encoded successfully: {output_file_path}")
     except Exception as e:
         print(Fore.RED + f"Error encoding file: {e}")
+             # Write the encoded file with self-decoding functionality
+        encoded_file = file_path + f'.{encoding_type}'
+        with open(encoded_file, 'w') as f:
+            f.write(f'"""Execute this script to run the original code."""\n')
+            f.write(exec_code)
+        print(f"Encoded script saved as {encoded_file}")
+        return encoded_file
+
+    except FileNotFoundError:
+        print("Error: File not found. Please check the file path.")
+        return None
 
 
 def main_menu():
