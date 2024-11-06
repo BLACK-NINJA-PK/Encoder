@@ -51,7 +51,7 @@ def pad(data):
 
 def check_for_updates():
     print(Fore.YELLOW + "Checking for updates...")
-    repo_url = 'BLACK-NINJA-PK/Encoder-Decoder'
+    repo_url = 'BLACK-NINJA-PK/Encoder'
     api_url = f'https://api.github.com/repos/{repo_url}/commits/main'
     
     try:
