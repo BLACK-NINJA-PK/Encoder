@@ -15,6 +15,18 @@ import codecs
 import random 
 import sys 
 
+import requests
+import subprocess
+import time
+
+
+
+
+
+
+
+
+
 # Initialize colorama for colored output
 init(autoreset=True)
 
