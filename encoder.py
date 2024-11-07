@@ -13,6 +13,7 @@ import pyfiglet
 from colorama import Fore, Style, init
 import codecs
 import random 
+import sys 
 
 # Initialize colorama for colored output
 init(autoreset=True)
